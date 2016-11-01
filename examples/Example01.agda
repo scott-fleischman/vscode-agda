@@ -2,14 +2,14 @@
 --
     data Nat : Set₀ where
       zero : Nat
-      succ : Nat -> Nat
+      succ : Nat → Nat
   --
       con : Nat
 --
-       -> {- text -} okay {- text -}
-{- text -} -> okay
-       -> okay
-      -> nope
+       → {- text -} okay {- text -}
+{- text -} → okay
+       → okay
+      → nope
 
     invalid
 
@@ -25,7 +25,7 @@
         inductive
         field
           car : Set₀
-          _*_ : car -> car -> car
+          _*_ : car → car → car
 
  -- outside module
  data Nope : Set where
