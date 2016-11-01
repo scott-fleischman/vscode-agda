@@ -19,7 +19,7 @@ export default class Agda {
   }
 
   public dispose(): void {
-    this.readline.close();
+    return;
   }
 
   public initialize(): void {
