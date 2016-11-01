@@ -7,7 +7,6 @@ export default function(session: Session): server.RequestHandler<server.Initiali
     session.initConf = event;
     session.settings.agda = event.initializationOptions;
     await session.initialize();
-    // check for response
     return { capabilities };
   };
 }

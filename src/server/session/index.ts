@@ -44,6 +44,7 @@ export default class Session {
 
   public onDidChangeConfiguration({ settings }: server.DidChangeConfigurationParams): void {
     this.settings = settings;
+    this.analyzer.onDidChangeConfiguration();
     this.synchronizer.onDidChangeConfiguration();
   }
 }

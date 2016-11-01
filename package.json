@@ -27,6 +27,25 @@
   ],
   "main": "./out/src/extension",
   "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "Agda configuration",
+      "properties": {
+        "agda.path": {
+          "type": "string",
+          "default": "agda",
+          "description": "The path to the Agda binary."
+        },
+        "agda.arguments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Additional arguments to pass to the Agda binary."
+        }
+      }
+    },
     "grammars": [
       {
         "language": "agda",
@@ -53,12 +72,14 @@
     "vscode:prepublish": "tsc -p ./"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.36",
     "@types/node": "^6.0.40",
     "tslint": "^3.13.0",
     "typescript": "^2.0.6",
     "vscode": "^1.0.3"
   },
   "dependencies": {
+    "lodash": "^4.15.0",
     "vscode-jsonrpc": "^2.4.0",
     "vscode-languageclient": "^2.5.0",
     "vscode-languageserver": "^2.5.0",
