@@ -26,7 +26,7 @@
     },
     "module": {
       "begin": "^([[:space:]]*+)\\b(module)\\b",
-      "while": "^(?:\\1[[:space:]]+|[[:space:]]*($|[{-]-|-[-}]))",
+      "end": "^(?![^[:space:]]|\\1[[:space:]]+|[[:space:]]*(?:$|[{-]-|-[-}]))",
       "beginCaptures": {
         "2": { "name": "keyword.control" }
       },
@@ -55,7 +55,7 @@
     },
     "data-decl": {
       "begin": "^([[:space:]]*+)\\b(data)\\b",
-      "while": "^(?:\\1[[:space:]]+|[[:space:]]*($|[{-]-|-[-}]))",
+      "end": "^(?!\\1[[:space:]]+|[[:space:]]*(?:$|[{-]-|-[-}]))",
       "beginCaptures": {
         "2": { "name": "keyword.control" }
       },
@@ -95,7 +95,7 @@
     },
     "data-decl-constructor": {
       "begin": "^([[:space:]]*+)(?![{-]-)(?!->|→)([[^(){}]&&[:graph:]]+)",
-      "while": "^(?:\\1[[:space:]]+|[[:space:]]*($|[{-]-|-[-}]))",
+      "end": "^(?!\\1[[:space:]]+|[[:space:]]*(?:$|[{-]-|-[-}]))",
       "beginCaptures": {
         "2": { "name": "constant.language" }
       },
@@ -113,7 +113,7 @@
     },
     "record-decl": {
       "begin": "^([[:space:]]*+)\\b(record)\\b",
-      "while": "^(?:\\1[[:space:]]+|[[:space:]]*($|[{-]-|-[-}]))",
+      "end": "^(?!\\1[[:space:]]+|[[:space:]]*(?:$|[{-]-|-[-}]))",
       "beginCaptures": {
         "2": { "name": "keyword.control" }
       },
@@ -154,7 +154,7 @@
     },
     "record-fields": {
       "begin": "^([[:space:]]*+)\\b(field)\\b",
-      "while": "^(?:\\1[[:space:]]+|[[:space:]]*($|[{-]-|-[-}]))",
+      "end": "^(?!\\1[[:space:]]+|[[:space:]]*(?:$|[{-]-|-[-}]))",
       "beginCaptures": {
         "2": { "name": "keyword.control" }
       },
