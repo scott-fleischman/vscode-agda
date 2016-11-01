@@ -52,8 +52,7 @@ export default class Agda {
     this.process.stdout.on("data", this.transducer.feed.bind(this.transducer));
     this.process.on("error", (error: Error & { code: string }) => {
       if (error.code === "ENOENT") {
-        const msg = `Cannot find an Agda binary at "${agdaPath}".`;
-        this.session.connection.window.showWarningMessage(msg);
+        this.session.connection.window.showWarningMessage(`Cannot find an Agda binary at "${agdaPath}".`);
         this.session.connection.window.showWarningMessage(`Double check your path or try configuring "agda.path" under "User Settings".`);
         this.dispose();
         throw error;
