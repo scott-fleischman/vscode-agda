@@ -1,0 +1,68 @@
+{
+  "private": true,
+  "name": "agda",
+  "displayName": "Agda",
+  "description": "Agda language support",
+  "version": "0.0.0",
+  "publisher": "freebroccolo",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/freebroccolo/vscode-agda/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/freebroccolo/vscode-agda.git"
+  },
+  "engines": {
+    "vscode": "^1.5.0"
+  },
+  "categories": [
+    "Debuggers",
+    "Languages",
+    "Linters"
+  ],
+  "icon": "assets/logo.png",
+  "activationEvents": [
+    "onLanguage:agda"
+  ],
+  "main": "./out/src/extension",
+  "contributes": {
+    "grammars": [
+      {
+        "language": "agda",
+        "scopeName": "source.agda",
+        "path": "./syntaxes/agda.json"
+      }
+    ],
+    "languages": [
+      {
+        "id": "agda",
+        "aliases": [
+          "Agda"
+        ],
+        "extensions": [
+          ".agda"
+        ],
+        "configuration": "./agda.configuration.json"
+      }
+    ]
+  },
+  "scripts": {
+    "compile": "tsc -watch -p ./",
+    "postinstall": "node ./node_modules/vscode/bin/install",
+    "vscode:prepublish": "tsc -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "^6.0.40",
+    "tslint": "^3.13.0",
+    "typescript": "^2.0.6",
+    "vscode": "^1.0.3"
+  },
+  "dependencies": {
+    "vscode-jsonrpc": "^2.4.0",
+    "vscode-languageclient": "^2.5.0",
+    "vscode-languageserver": "^2.5.0",
+    "vscode-languageserver-types": "^1.0.3"
+  },
+  "extensionDependencies": []
+}

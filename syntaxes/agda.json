@@ -1,0 +1,193 @@
+{
+  "scopeName": "source.agda",
+  "fileTypes": [
+    "agda"
+  ],
+  "patterns": [
+    { "include": "#comment" },
+    { "include": "#module" }
+  ],
+  "repository": {
+    "comment": {
+      "patterns": [
+        {
+          "match": "(--).*$",
+          "name": "comment.line"
+        },
+        {
+          "begin": "{-",
+          "end": "-}",
+          "name": "comment.block",
+          "patterns": [
+            { "include": "#comment" }
+          ]
+        }
+      ]
+    },
+    "module": {
+      "begin": "^([[:space:]]*+)\\b(module)\\b",
+      "while": "^(?:\\1[[:space:]]+|[[:space:]]*($|[{-]-|-[-}]))",
+      "beginCaptures": {
+        "2": { "name": "keyword.control" }
+      },
+      "patterns": [
+        { "include": "#comment" },
+        {
+          "begin": "\\G",
+          "end": "\\b(where)\\b",
+          "endCaptures": {
+            "1": { "name": "keyword.control" }
+          },
+          "patterns": [
+            {
+              "begin": "\\G",
+              "end": "[[^(){}]&&[:graph:]]+",
+              "endCaptures": {
+                "0": { "name": "entity.name.class" }
+              }
+            }
+          ]
+        },
+        { "include": "#data-decl" },
+        { "include": "#record-decl" },
+        { "include": "#module" }
+      ]
+    },
+    "data-decl": {
+      "begin": "^([[:space:]]*+)\\b(data)\\b",
+      "while": "^(?:\\1[[:space:]]+|[[:space:]]*($|[{-]-|-[-}]))",
+      "beginCaptures": {
+        "2": { "name": "keyword.control" }
+      },
+      "patterns": [
+        { "include": "#comment" },
+        {
+          "begin": "\\G",
+          "end": "\\b(where)\\b",
+          "endCaptures": {
+            "1": { "name": "keyword.control" }
+          },
+          "patterns": [
+            {
+              "begin": "\\G",
+              "end": "(:)",
+              "endCaptures": {
+                "1": { "name": "keyword.operator" }
+              },
+              "patterns": [
+                {
+                  "match": "[[^(){}]&&[:graph:]]+",
+                  "name": "support.type"
+                }
+              ]
+            },
+            {
+              "begin": "(?<=:)",
+              "end": "(?=\\b(where)\\b)",
+              "patterns": [
+                { "include": "#term" }
+              ]
+            }
+          ]
+        },
+        { "include": "#data-decl-constructor" }
+      ]
+    },
+    "data-decl-constructor": {
+      "begin": "^([[:space:]]*+)(?![{-]-)(?!->|→)([[^(){}]&&[:graph:]]+)",
+      "while": "^(?:\\1[[:space:]]+|[[:space:]]*($|[{-]-|-[-}]))",
+      "beginCaptures": {
+        "2": { "name": "constant.language" }
+      },
+      "patterns": [
+        { "include": "#comment" },
+        {
+          "begin": "\\G",
+          "end": "(:)",
+          "endCaptures": {
+            "1": { "name": "keyword.operator" }
+          }
+        },
+        { "include": "#term" }
+      ]
+    },
+    "record-decl": {
+      "begin": "^([[:space:]]*+)\\b(record)\\b",
+      "while": "^(?:\\1[[:space:]]+|[[:space:]]*($|[{-]-|-[-}]))",
+      "beginCaptures": {
+        "2": { "name": "keyword.control" }
+      },
+      "patterns": [
+        { "include": "#comment" },
+        {
+          "begin": "\\G",
+          "end": "\\b(where)\\b",
+          "endCaptures": {
+            "1": { "name": "keyword.control" }
+          },
+          "patterns": [
+            {
+              "begin": "\\G",
+              "end": "(:)",
+              "endCaptures": {
+                "1": { "name": "keyword.operator" }
+              },
+              "patterns": [
+                {
+                  "match": "[[^(){}]&&[:graph:]]+",
+                  "name": "support.type"
+                }
+              ]
+            },
+            {
+              "begin": "(?<=:)",
+              "end": "(?=\\b(where)\\b)",
+              "patterns": [
+                { "include": "#term" }
+              ]
+            }
+          ]
+        },
+        { "include": "#record-pragma" },
+        { "include": "#record-fields" }
+      ]
+    },
+    "record-fields": {
+      "begin": "^([[:space:]]*+)\\b(field)\\b",
+      "while": "^(?:\\1[[:space:]]+|[[:space:]]*($|[{-]-|-[-}]))",
+      "beginCaptures": {
+        "2": { "name": "keyword.control" }
+      },
+      "patterns": [
+        { "include": "#comment" },
+        { "include": "#data-decl-constructor" }
+      ]
+    },
+    "record-pragma": {
+      "patterns": [
+        {
+          "match": "no-eta-equality",
+          "name": "keyword.control"
+        },
+        {
+          "match": "(?:co)?inductive",
+          "name": "keyword.control"
+        }
+      ]
+    },
+    "term": {
+      "patterns": [
+        { "include": "#term-arrow" },
+        { "include": "#term-set" }
+      ]
+    },
+    "term-arrow": {
+      "match": "→|->",
+      "name": "keyword.other"
+    },
+    "term-set": {
+      "match": "\\b(Set[0-9₀₁₂₃₄₅₆₇₈₉]*)\\b",
+      "name": "constant.language"
+    }
+  }
+}
