@@ -10,19 +10,21 @@
   "repository": {
     "comment": {
       "patterns": [
-        {
-          "match": "(--).*$",
-          "name": "comment.line"
-        },
-        {
-          "begin": "{-",
-          "end": "-}",
-          "name": "comment.block",
-          "patterns": [
-            { "include": "#comment" }
-          ]
-        }
+        { "include": "#comment-block" },
+        { "include": "#comment-line" }
       ]
+    },
+    "comment-block": {
+      "begin": "{-",
+      "end": "-}",
+      "name": "comment.block",
+      "patterns": [
+        { "include": "#comment-block" }
+      ]
+    },
+    "comment-line": {
+      "match": "(--).*$",
+      "name": "comment.line"
     },
     "module": {
       "begin": "^([[:space:]]*+)\\b(module)\\b",

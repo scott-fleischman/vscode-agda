@@ -1,7 +1,7 @@
-import * as vscode from "vscode";
+import ClientWindow from "../ClientWindow";
+import * as highlightAnnotations from "./highlightAnnotations";
 import * as client from "vscode-languageclient";
 
-export function registerAll(context: vscode.ExtensionContext, languageClient: client.LanguageClient): void {
-  void context;
-  void languageClient;
+export function registerAll(window: ClientWindow, languageClient: client.LanguageClient): void {
+  highlightAnnotations.register(window, languageClient);
 }

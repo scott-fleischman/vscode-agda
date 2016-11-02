@@ -6,14 +6,14 @@ import Analyzer from "./analyzer";
 import Synchronizer from "./synchronizer";
 
 export default class Session {
-  public initConf: server.InitializeParams;
-  public settings: ISettings = ({} as any);
+  public readonly agda: Agda;
+  public readonly analyzer: Analyzer;
   public readonly connection: server.IConnection = server.createConnection(
     new server.IPCMessageReader(process),
     new server.IPCMessageWriter(process),
   );
-  public readonly agda: Agda;
-  public readonly analyzer: Analyzer;
+  public initConf: server.InitializeParams;
+  public settings: ISettings = ({} as any);
   public readonly synchronizer: Synchronizer;
 
   constructor() {
