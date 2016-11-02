@@ -1,3 +1,4 @@
+import * as agda from "./agda";
 import * as types from "./types";
 
 export interface ISettings {
@@ -8,5 +9,6 @@ export interface ISettings {
 }
 
 export {
+  agda,
   types,
 };
