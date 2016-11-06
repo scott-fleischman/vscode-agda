@@ -31,6 +31,7 @@ export default class Session {
   public async initialize(): Promise<void> {
     await this.agda.initialize();
     await this.synchronizer.initialize();
+    await this.analyzer.initialize();
   }
 
   public listen(): void {

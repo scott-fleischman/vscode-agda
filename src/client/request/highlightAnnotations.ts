@@ -1,9 +1,9 @@
 import { remote } from "../../shared";
-import ClientWindow from "../ClientWindow";
+import Session from "../session";
+import Window from "../window";
 import * as vscode from "vscode";
-import * as client from "vscode-languageclient";
 
-function handler(window: ClientWindow): (data: remote.client.IFileAnnotations) => Promise<void> {
+function handler(window: Window): (data: remote.client.IFileAnnotations) => Promise<void> {
   return async ({ fileName, annotations }) => {
     const uri = vscode.Uri.parse(`file://${fileName}`);
     const document = await vscode.workspace.openTextDocument(uri);
@@ -17,13 +17,14 @@ function handler(window: ClientWindow): (data: remote.client.IFileAnnotations) =
     }
     for (const editor of vscode.window.visibleTextEditors) {
       if (editor.document.fileName !== fileName) continue;
-      for (const [face, ranges] of Array.from(collatedHighlights.entries())) {
-        editor.setDecorations((window as any).decorationTypes[face], ranges);
+      for (const face of Object.keys(window.decorationTypes) as remote.client.HighlightFace[]) {
+        // NOTE: use [] if lookup fails since we need to clear stale (i.e., no longer used) faces too
+        editor.setDecorations(window.decorationTypes[face], collatedHighlights.get(face) || []);
       }
     }
   };
 }
 
-export function register(window: ClientWindow, languageClient: client.LanguageClient): void {
-  languageClient.onNotification(remote.client.highlightAnnotations, handler(window));
+export function register(session: Session): void {
+  session.languageClient.onNotification(remote.client.highlightAnnotations, handler(session.window));
 }

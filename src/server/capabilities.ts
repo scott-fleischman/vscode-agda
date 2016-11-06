@@ -2,7 +2,7 @@ import * as server from "vscode-languageserver";
 
 const capabilities: server.ServerCapabilities = {
   codeActionProvider: false,
-  codeLensProvider: undefined, // { resolveProvider: false }
+  codeLensProvider: undefined, // { resolveProvider: false },
   completionProvider: undefined, // { resolveProvider: false, triggerCharacters: [] },
   definitionProvider: false,
   documentFormattingProvider: false,

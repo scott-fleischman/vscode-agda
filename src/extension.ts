@@ -9,7 +9,9 @@ const agdaConfiguration = {
 
 export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(vscode.languages.setLanguageConfiguration("agda", agdaConfiguration));
-  await client.launch(context);
+  const session = new client.Session(context);
+  await session.onReady();
+  // context.subscriptions.push(session);
 }
 
 export function deactivate() {

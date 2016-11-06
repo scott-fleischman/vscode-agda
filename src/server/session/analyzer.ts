@@ -1,7 +1,8 @@
 import { types } from "../../shared";
+import * as command from "../command";
 import Session from "./index";
 import * as _ from "lodash";
-import * as server from "vscode-languageserver";
+import * as url from "url";
 
 export default class Analyzer {
   public refreshImmediate: ((event: types.TextDocumentIdentifier) => Promise<void>);
@@ -25,17 +26,17 @@ export default class Analyzer {
   }
 
   public async initialize(): Promise<void> {
-    return;
+    this.onDidChangeConfiguration();
   }
 
   public onDidChangeConfiguration(): void {
-    return;
+    this.refreshImmediate = this.refresh;
+    this.refreshDebounced = _.debounce(this.refresh, 2000, { trailing: true });
   }
 
-  public refreshWithKind(syncKind: server.TextDocumentSyncKind): (id: types.TextDocumentIdentifier) => Promise<void> {
-    return async (id) => {
-      void syncKind;
-      void id;
-    };
+  public async refresh(id: types.TextDocumentIdentifier): Promise<void> {
+    const uri = url.parse(id.uri);
+    const fileName = uri.path;
+    if (fileName) command.load(this.session, { fileName });
   }
 }

@@ -1,11 +1,12 @@
 import { remote } from "../../shared";
-import * as vscode from "vscode";
-import * as client from "vscode-languageclient";
+import Session from "../session";
+import * as vs from "vscode";
 
-export function register(context: vscode.ExtensionContext, languageClient: client.LanguageClient): void {
-  context.subscriptions.push(
-    vscode.commands.registerTextEditorCommand("agda.load", async (editor: vscode.TextEditor): Promise<void> => {
-      if (editor.document.languageId !== "agda") return;
-      languageClient.sendNotification(remote.server.load, { fileName: editor.document.fileName });
-    }));
+export function register(session: Session): void {
+  session.subscriptions.push(vs.commands.registerTextEditorCommand("agda.load", async ({ document }: vs.TextEditor): Promise<void> => {
+    if (document.languageId !== "agda") return;
+    let ready = true;
+    if (document.isDirty) ready = await document.save();
+    if (ready) session.languageClient.sendNotification(remote.server.load, { fileName: document.fileName });
+  }));
 }
