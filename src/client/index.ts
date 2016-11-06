@@ -34,6 +34,6 @@ export async function launch(context: vscode.ExtensionContext): Promise<void> {
   context.subscriptions.push(window);
   context.subscriptions.push(session);
   await languageClient.onReady();
-  window.statusBarItem.text = "$(hubot) [agda]";
+  window.statusBarItem.text = "$(server) [agda]";
   window.statusBarItem.tooltip = "agda server online";
 }
