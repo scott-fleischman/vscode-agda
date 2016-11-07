@@ -1,10 +1,10 @@
 import { remote } from "../../shared";
 import Session from "../session";
-import Window from "../window";
 import * as vs from "vscode";
 
-function handler(window: Window): (data: remote.client.IFileAnnotations) => Promise<void> {
+function handler(session: Session): (data: remote.client.IFileAnnotations) => Promise<void> {
   return async ({ fileName, annotations }) => {
+    const window = session.window;
     const uri = vs.Uri.parse(`file://${fileName}`);
     const document = await vs.workspace.openTextDocument(uri);
     const collatedHighlights: Map<remote.client.HighlightFace, vs.Range[]> = new Map();
@@ -26,5 +26,5 @@ function handler(window: Window): (data: remote.client.IFileAnnotations) => Prom
 }
 
 export function register(session: Session): void {
-  session.languageClient.onNotification(remote.client.highlightAnnotations, handler(session.window));
+  session.languageClient.onNotification(remote.client.highlightAnnotations, handler(session));
 }
