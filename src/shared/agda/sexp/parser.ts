@@ -1,22 +1,11 @@
 // tslint:disable object-literal-sort-keys
 
-import { remote } from "../../../shared";
 import Session from "../../../server/session";
+import { remote } from "../../../shared";
 import * as token from "./token";
 import * as chevrotain from "chevrotain";
 
 export default class Parser extends chevrotain.Parser {
-  private readonly fileName: string;
-  private readonly session: Session;
-
-  constructor(session: Session, fileName: string, input: chevrotain.Token[]) {
-    super(input, token.all);
-    this.fileName = fileName;
-    this.session = session;
-    chevrotain.Parser.performSelfAnalysis(this);
-    return this;
-  }
-
   public command = this.RULE("command", () => {
     this.CONSUME(token.LPAREN);
     this.OR([
@@ -48,8 +37,8 @@ export default class Parser extends chevrotain.Parser {
     this.CONSUME2(token.RPAREN);
     return {
       fileName: this.fileName,
-      startOff: parseInt(chevrotain.getImage(start)) - 1,
-      endOff: parseInt(chevrotain.getImage(end)) - 1,
+      startOff: parseInt(chevrotain.getImage(start), 10) - 1,
+      endOff: parseInt(chevrotain.getImage(end), 10) - 1,
       face: chevrotain.getImage(kind) as remote.client.HighlightFace,
     };
   });
@@ -106,7 +95,7 @@ export default class Parser extends chevrotain.Parser {
     this.CONSUME(token.LPAREN);
     // FIXME: payload
     this.CONSUME(token.RPAREN);
-  })
+  });
 
   public infoAction = this.RULE("infoAction", () => {
     this.CONSUME(token.INFO_ACTION);
@@ -122,4 +111,15 @@ export default class Parser extends chevrotain.Parser {
     this.CONSUME(token.STATUS_ACTION);
     this.CONSUME(token.STRING);
   });
+
+  private readonly fileName: string;
+  private readonly session: Session;
+
+  constructor(session: Session, fileName: string, input: chevrotain.Token[]) {
+    super(input, token.all);
+    this.fileName = fileName;
+    this.session = session;
+    chevrotain.Parser.performSelfAnalysis(this);
+    return this;
+  }
 }
