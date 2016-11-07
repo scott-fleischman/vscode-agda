@@ -3,5 +3,5 @@ import Session from "../session";
 import * as server from "vscode-languageserver";
 
 export default function (session: Session): server.NotificationHandler<{ fileName: string }> {
-  return async (data) => command.load(session, data);
+  return async (data) => command.loadFile(session, data);
 }

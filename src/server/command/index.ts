@@ -1,5 +1,5 @@
-import load from "./load";
+import loadFile from "./loadFile";
 
 export {
-  load,
+  loadFile,
 }

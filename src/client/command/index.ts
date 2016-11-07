@@ -1,6 +1,6 @@
 import Session from "../session";
-import * as load from "./load";
+import * as loadFile from "./loadFile";
 
 export function registerAll(session: Session): void {
-  load.register(session);
+  loadFile.register(session);
 }

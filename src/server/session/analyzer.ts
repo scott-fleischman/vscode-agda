@@ -37,6 +37,6 @@ export default class Analyzer {
   public async refresh(id: types.TextDocumentIdentifier): Promise<void> {
     const uri = url.parse(id.uri);
     const fileName = uri.path;
-    if (fileName) command.load(this.session, { fileName });
+    if (fileName) command.loadFile(this.session, { fileName });
   }
 }
