@@ -1,5 +1,5 @@
 import * as command from "./command";
-import ErrorHandler from "./ErrorHandler";
+import ErrorHandler from "./errorHandler";
 import * as request from "./request";
 import Window from "./window";
 import * as path from "path";
