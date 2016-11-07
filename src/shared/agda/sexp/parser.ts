@@ -7,7 +7,7 @@ import * as chevrotain from "chevrotain";
 
 export default class Parser extends chevrotain.Parser {
   public command = this.RULE("command", () => {
-    this.CONSUME(token.LPAREN);
+    this.CONSUME(token.DELIM_LPAREN);
     this.OR([
       { ALT: () => this.SUBRULE(this.highlightAddAnnotations) },
       { ALT: () => this.SUBRULE(this.highlightClear) },
@@ -15,26 +15,26 @@ export default class Parser extends chevrotain.Parser {
       { ALT: () => this.SUBRULE(this.infoAction) },
       { ALT: () => this.SUBRULE(this.statusAction) },
     ]);
-    this.CONSUME(token.RPAREN);
+    this.CONSUME(token.DELIM_RPAREN);
   });
 
   public highlightAnnotation = this.RULE("highlightAnnotation", () => {
-    this.CONSUME(token.QUOTE);
-    this.CONSUME1(token.LPAREN);
-    const start = this.CONSUME1(token.INTEGER);
-    const end = this.CONSUME2(token.INTEGER);
+    this.CONSUME(token.SYMBOL_QUOTE);
+    this.CONSUME1(token.DELIM_LPAREN);
+    const start = this.CONSUME1(token.LITERAL_INTEGER);
+    const end = this.CONSUME2(token.LITERAL_INTEGER);
     const kind = this.SUBRULE(this.highlightAnnotationKind);
     this.OR([
-      { ALT: () => this.CONSUME(token.NIL) },
+      { ALT: () => this.CONSUME(token.SYMBOL_NIL) },
     ]);
     this.OPTION(() => {
-      this.CONSUME2(token.LPAREN);
-      this.CONSUME(token.STRING);
-      this.CONSUME(token.DOT);
-      this.CONSUME3(token.INTEGER);
-      this.CONSUME1(token.RPAREN);
+      this.CONSUME2(token.DELIM_LPAREN);
+      this.CONSUME(token.LITERAL_STRING);
+      this.CONSUME(token.DELIM_DOT);
+      this.CONSUME3(token.LITERAL_INTEGER);
+      this.CONSUME1(token.DELIM_RPAREN);
     });
-    this.CONSUME2(token.RPAREN);
+    this.CONSUME2(token.DELIM_RPAREN);
     return {
       fileName: this.fileName,
       startOff: parseInt(chevrotain.getImage(start), 10) - 1,
@@ -44,7 +44,7 @@ export default class Parser extends chevrotain.Parser {
   });
 
   public highlightAnnotationKind = this.RULE("highlightAnnotationKind", () => {
-    this.CONSUME(token.LPAREN);
+    this.CONSUME(token.DELIM_LPAREN);
     const kind = this.OR([
       { ALT: () => this.CONSUME(token.FACE_BOUND) },
       { ALT: () => this.CONSUME(token.FACE_COINDUCTIVE_CONSTRUCTOR) },
@@ -73,43 +73,43 @@ export default class Parser extends chevrotain.Parser {
       { ALT: () => this.CONSUME(token.FACE_UNSOLVED_CONSTRAINT) },
       { ALT: () => this.CONSUME(token.FACE_UNSOLVED_META) },
     ]);
-    this.CONSUME(token.RPAREN);
+    this.CONSUME(token.DELIM_RPAREN);
     return kind;
   });
 
   public highlightAddAnnotations = this.RULE("highlightAddAnnotations", () => {
     const fileName = this.fileName;
     const annotations: remote.client.IAnnotation[] = [];
-    this.CONSUME(token.HIGHLIGHT_ADD_ANNOTATIONS);
+    this.CONSUME(token.SYMBOL_AGDA2_HIGHLIGHT_ADD_ANNOTATIONS);
     this.MANY(() => annotations.push(this.SUBRULE(this.highlightAnnotation)));
     this.session.connection.sendNotification(remote.client.highlightAnnotations, { fileName, annotations });
   });
 
   public highlightClear = this.RULE("highlightClear", () => {
-    this.CONSUME(token.HIGHLIGHT_CLEAR);
+    this.CONSUME(token.SYMBOL_AGDA2_HIGHLIGHT_CLEAR);
   });
 
   public goalsAction = this.RULE("goalsAction", () => {
-    this.CONSUME(token.GOALS_ACTION);
-    this.CONSUME(token.QUOTE);
-    this.CONSUME(token.LPAREN);
+    this.CONSUME(token.SYMBOL_AGDA2_GOALS_ACTION);
+    this.CONSUME(token.SYMBOL_QUOTE);
+    this.CONSUME(token.DELIM_LPAREN);
     // FIXME: payload
-    this.CONSUME(token.RPAREN);
+    this.CONSUME(token.DELIM_RPAREN);
   });
 
   public infoAction = this.RULE("infoAction", () => {
-    this.CONSUME(token.INFO_ACTION);
-    this.CONSUME1(token.STRING);
-    this.CONSUME2(token.STRING);
+    this.CONSUME(token.SYMBOL_AGDA2_INFO_ACTION);
+    this.CONSUME1(token.LITERAL_STRING);
+    this.CONSUME2(token.LITERAL_STRING);
     this.OR([
-      { ALT: () => this.CONSUME(token.NIL) },
-      { ALT: () => this.CONSUME(token.TRUE) },
+      { ALT: () => this.CONSUME(token.SYMBOL_NIL) },
+      { ALT: () => this.CONSUME(token.SYMBOL_TRUE) },
     ]);
   });
 
   public statusAction = this.RULE("statusAction", () => {
-    this.CONSUME(token.STATUS_ACTION);
-    this.CONSUME(token.STRING);
+    this.CONSUME(token.SYMBOL_AGDA2_STATUS_ACTION);
+    this.CONSUME(token.LITERAL_STRING);
   });
 
   private readonly fileName: string;

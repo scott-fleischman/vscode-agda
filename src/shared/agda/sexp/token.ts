@@ -6,8 +6,16 @@ import {
   TokenConstructor,
 } from "chevrotain";
 
-export class DOT extends SimpleLazyToken {
+export class DELIM_DOT extends SimpleLazyToken {
   public static PATTERN = /[.]/;
+}
+
+export class DELIM_LPAREN extends SimpleLazyToken {
+  public static PATTERN = /[(]/;
+}
+
+export class DELIM_RPAREN extends SimpleLazyToken {
+  public static PATTERN = /[)]/;
 }
 
 export class FACE_BOUND extends SimpleLazyToken {
@@ -114,48 +122,12 @@ export class FACE_UNSOLVED_META extends SimpleLazyToken {
   public static PATTERN = /\bunsolvedmeta\b/;
 }
 
-export class GOALS_ACTION extends SimpleLazyToken {
-  public static PATTERN = /\bagda2-goals-action\b/;
-}
-
-export class HIGHLIGHT_ADD_ANNOTATIONS extends SimpleLazyToken {
-  public static PATTERN = /\bagda2-highlight-add-annotations\b/;
-}
-
-export class HIGHLIGHT_CLEAR extends SimpleLazyToken {
-  public static PATTERN = /\bagda2-highlight-clear\b/;
-}
-
-export class INFO_ACTION extends SimpleLazyToken {
-  public static PATTERN = /\bagda2-info-action\b/;
-}
-
-export class INTEGER extends SimpleLazyToken {
+export class LITERAL_INTEGER extends SimpleLazyToken {
   public static PATTERN = /[\d]+/;
 }
 
-export class LAST extends SimpleLazyToken {
-  public static PATTERN = /\blast\b/;
-}
-
-export class LPAREN extends SimpleLazyToken {
-  public static PATTERN = /[(]/;
-}
-
-export class MAYBE_GOTO extends SimpleLazyToken {
-  public static PATTERN = /\bagda2-maybe-goto\b/;
-}
-
-export class NIL extends SimpleLazyToken {
-  public static PATTERN = /\bnil\b/;
-}
-
-export class QUOTE extends SimpleLazyToken {
-  public static PATTERN = /'/;
-}
-
-export class RPAREN extends SimpleLazyToken {
-  public static PATTERN = /[)]/;
+export class LITERAL_STRING extends SimpleLazyToken {
+  public static PATTERN = /["](?:\\.|[^"])*["]/;
 }
 
 export class SPACE extends SimpleLazyToken {
@@ -163,20 +135,63 @@ export class SPACE extends SimpleLazyToken {
   public static PATTERN = /\s+/;
 }
 
-export class STATUS_ACTION extends SimpleLazyToken {
+export class SYMBOL_AGDA2_GOALS_ACTION extends SimpleLazyToken {
+  public static PATTERN = /\bagda2-goals-action\b/;
+}
+
+export class SYMBOL_AGDA2_HIGHLIGHT_ADD_ANNOTATIONS extends SimpleLazyToken {
+  public static PATTERN = /\bagda2-highlight-add-annotations\b/;
+}
+
+export class SYMBOL_AGDA2_HIGHLIGHT_CLEAR extends SimpleLazyToken {
+  public static PATTERN = /\bagda2-highlight-clear\b/;
+}
+
+export class SYMBOL_AGDA2_INFO_ACTION extends SimpleLazyToken {
+  public static PATTERN = /\bagda2-info-action\b/;
+}
+
+export class SYMBOL_AGDA2_MAYBE_GOTO extends SimpleLazyToken {
+  public static PATTERN = /\bagda2-maybe-goto\b/;
+}
+
+export class SYMBOL_AGDA2_STATUS_ACTION extends SimpleLazyToken {
   public static PATTERN = /\bagda2-status-action\b/;
 }
 
-export class STRING extends SimpleLazyToken {
-  public static PATTERN = /["](?:\\.|[^"])*["]/;
+export class SYMBOL_LAST extends SimpleLazyToken {
+  public static PATTERN = /\blast\b/;
 }
 
-export class TRUE extends SimpleLazyToken {
+export class SYMBOL_NIL extends SimpleLazyToken {
+  public static PATTERN = /\bnil\b/;
+}
+
+export class SYMBOL_QUOTE extends SimpleLazyToken {
+  public static PATTERN = /'/;
+}
+
+export class SYMBOL_TRUE extends SimpleLazyToken {
   public static PATTERN = /\bt\b/;
 }
 
 export const all: TokenConstructor[] = [
-  DOT,
+  SPACE,
+  DELIM_LPAREN,
+  DELIM_RPAREN,
+  SYMBOL_AGDA2_GOALS_ACTION,
+  SYMBOL_AGDA2_HIGHLIGHT_ADD_ANNOTATIONS,
+  SYMBOL_AGDA2_HIGHLIGHT_CLEAR,
+  SYMBOL_AGDA2_INFO_ACTION,
+  SYMBOL_AGDA2_MAYBE_GOTO,
+  SYMBOL_AGDA2_STATUS_ACTION,
+  SYMBOL_LAST,
+  SYMBOL_QUOTE,
+  LITERAL_INTEGER,
+  LITERAL_STRING,
+  DELIM_DOT,
+  SYMBOL_NIL,
+  SYMBOL_TRUE,
   FACE_BOUND,
   FACE_COINDUCTIVE_CONSTRUCTOR,
   FACE_COMMENT,
@@ -203,19 +218,4 @@ export const all: TokenConstructor[] = [
   FACE_TYPECHECKS,
   FACE_UNSOLVED_CONSTRAINT,
   FACE_UNSOLVED_META,
-  GOALS_ACTION,
-  HIGHLIGHT_ADD_ANNOTATIONS,
-  HIGHLIGHT_CLEAR,
-  INFO_ACTION,
-  INTEGER,
-  LAST,
-  LPAREN,
-  MAYBE_GOTO,
-  NIL,
-  QUOTE,
-  RPAREN,
-  SPACE,
-  STATUS_ACTION,
-  STRING,
-  TRUE,
 ];
