@@ -62,7 +62,7 @@ export default class Agda {
     return new Promise((resolve) => this.transducer.once("agda/lines", resolve));
   }
 
-  public async request(fileName: string, command: string): Promise<void> {
+  public async execute(fileName: string, command: string): Promise<void> {
     command += "\n";
     return new Promise<void>((resolve) => {
       this.process.stdin.write(command, () => {
