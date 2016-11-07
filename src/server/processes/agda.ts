@@ -1,3 +1,4 @@
+import { agda } from "../../shared";
 import Session from "../session";
 import * as childProcess from "child_process";
 import * as events from "events";
@@ -61,8 +62,19 @@ export default class Agda {
     return new Promise((resolve) => this.transducer.once("agda/lines", resolve));
   }
 
-  public request(query: string): Promise<string[]> {
-    query += "\n";
-    return new Promise((resolve) => this.process.stdin.write(query, () => this.transducer.once("agda/lines", resolve)));
+  public async request(fileName: string, command: string): Promise<void> {
+    command += "\n";
+    return new Promise<void>((resolve) => {
+      this.process.stdin.write(command, () => {
+        this.transducer.once("agda/lines", (response: string[]) => {
+          for (let line of response) {
+            const result = agda.sexp.Lexer.tokenize(line);
+            const parser = new agda.sexp.Parser(this.session, fileName, result.tokens);
+            parser.command();
+          }
+          resolve();
+        });
+      });
+    });
   }
 }
