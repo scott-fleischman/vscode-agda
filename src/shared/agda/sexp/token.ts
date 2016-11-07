@@ -143,6 +143,10 @@ export class SYMBOL_AGDA2_HIGHLIGHT_ADD_ANNOTATIONS extends SimpleLazyToken {
   public static PATTERN = /\bagda2-highlight-add-annotations\b/;
 }
 
+export class SYMBOL_AGDA2_HIGHLIGHT_AND_DELETE_ACTION extends SimpleLazyToken {
+  public static PATTERN = /\bagda2-highlight-load-and-delete-action\b/;
+}
+
 export class SYMBOL_AGDA2_HIGHLIGHT_CLEAR extends SimpleLazyToken {
   public static PATTERN = /\bagda2-highlight-clear\b/;
 }
@@ -181,6 +185,7 @@ export const all: TokenConstructor[] = [
   DELIM_RPAREN,
   SYMBOL_AGDA2_GOALS_ACTION,
   SYMBOL_AGDA2_HIGHLIGHT_ADD_ANNOTATIONS,
+  SYMBOL_AGDA2_HIGHLIGHT_AND_DELETE_ACTION,
   SYMBOL_AGDA2_HIGHLIGHT_CLEAR,
   SYMBOL_AGDA2_INFO_ACTION,
   SYMBOL_AGDA2_MAYBE_GOTO,

@@ -10,6 +10,7 @@ export default class Parser extends chevrotain.Parser {
     this.CONSUME(token.DELIM_LPAREN);
     this.OR([
       { ALT: () => this.SUBRULE(this.highlightAddAnnotations) },
+      // { ALT: () => this.SUBRULE(this.highlightAndDeleteAction) },
       { ALT: () => this.SUBRULE(this.highlightClear) },
       { ALT: () => this.SUBRULE(this.goalsAction) },
       { ALT: () => this.SUBRULE(this.infoAction) },
@@ -17,6 +18,13 @@ export default class Parser extends chevrotain.Parser {
     ]);
     this.CONSUME(token.DELIM_RPAREN);
   });
+
+  // public highlightAndDeleteAction = this.RULE("highlightAndDeleteAction", async () => {
+  //   this.CONSUME(token.SYMBOL_AGDA2_HIGHLIGHT_AND_DELETE_ACTION);
+  //   const fileNameToken = this.CONSUME(token.LITERAL_STRING);
+  //   const fileName = chevrotain.getImage(fileNameToken);
+  //   this.session.connection.console.log(fileName);
+  // });
 
   public highlightAnnotation = this.RULE("highlightAnnotation", () => {
     this.CONSUME(token.SYMBOL_QUOTE);
