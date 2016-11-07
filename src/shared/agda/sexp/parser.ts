@@ -10,7 +10,6 @@ export default class Parser extends chevrotain.Parser {
     this.CONSUME(token.DELIM_LPAREN);
     this.OR([
       { ALT: () => this.SUBRULE(this.highlightAddAnnotations) },
-      // { ALT: () => this.SUBRULE(this.highlightAndDeleteAction) },
       { ALT: () => this.SUBRULE(this.highlightClear) },
       { ALT: () => this.SUBRULE(this.goalsAction) },
       { ALT: () => this.SUBRULE(this.infoAction) },
@@ -18,13 +17,6 @@ export default class Parser extends chevrotain.Parser {
     ]);
     this.CONSUME(token.DELIM_RPAREN);
   });
-
-  // public highlightAndDeleteAction = this.RULE("highlightAndDeleteAction", async () => {
-  //   this.CONSUME(token.SYMBOL_AGDA2_HIGHLIGHT_AND_DELETE_ACTION);
-  //   const fileNameToken = this.CONSUME(token.LITERAL_STRING);
-  //   const fileName = chevrotain.getImage(fileNameToken);
-  //   this.session.connection.console.log(fileName);
-  // });
 
   public highlightAnnotation = this.RULE("highlightAnnotation", () => {
     this.CONSUME(token.SYMBOL_QUOTE);
@@ -90,7 +82,7 @@ export default class Parser extends chevrotain.Parser {
     const annotations: remote.client.IAnnotation[] = [];
     this.CONSUME(token.SYMBOL_AGDA2_HIGHLIGHT_ADD_ANNOTATIONS);
     this.MANY(() => annotations.push(this.SUBRULE(this.highlightAnnotation)));
-    this.session.connection.sendNotification(remote.client.highlightAnnotations, { fileName, annotations });
+    if (this.options.highlight) this.session.connection.sendNotification(remote.client.highlightAnnotations, { fileName, annotations });
   });
 
   public highlightClear = this.RULE("highlightClear", () => {
@@ -121,11 +113,13 @@ export default class Parser extends chevrotain.Parser {
   });
 
   private readonly fileName: string;
+  private readonly options: { highlight: boolean };
   private readonly session: Session;
 
-  constructor(session: Session, fileName: string, input: chevrotain.Token[]) {
+  constructor(session: Session, fileName: string, options: { highlight: boolean }, input: chevrotain.Token[]) {
     super(input, token.all);
     this.fileName = fileName;
+    this.options = options;
     this.session = session;
     chevrotain.Parser.performSelfAnalysis(this);
     return this;

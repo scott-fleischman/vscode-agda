@@ -27,13 +27,13 @@ export default class Synchronizer {
       this.session.analyzer.refreshImmediate(event.textDocument);
     });
 
-    this.session.connection.onDidChangeTextDocument(async (event): Promise<void> => {
+    this.session.connection.onDidChangeTextDocument(async (): Promise<void> => {
       // this.session.connection.console.log("onDidChangeTextDocument");
       // for (const change of event.contentChanges) {
       //   if (change && change.range) {
       //   };
       // }
-      this.session.analyzer.refreshDebounced(event.textDocument);
+      // this.session.analyzer.refreshDebounced(event.textDocument);
     });
 
     this.session.connection.onDidSaveTextDocument(async (event): Promise<void> => {

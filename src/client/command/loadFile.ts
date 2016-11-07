@@ -7,6 +7,6 @@ export function register(session: Session): void {
     if (document.languageId !== "agda") return;
     let ready = true;
     if (document.isDirty) ready = await document.save();
-    if (ready) session.languageClient.sendNotification(remote.server.load, { fileName: document.fileName });
+    if (ready) session.languageClient.sendNotification(remote.server.loadFile, { fileName: document.fileName });
   }));
 }

@@ -62,14 +62,14 @@ export default class Agda {
     return new Promise((resolve) => this.transducer.once("agda/lines", resolve));
   }
 
-  public async execute(fileName: string, command: string): Promise<void> {
+  public async execute(fileName: string, command: string, options: { highlight: boolean } = { highlight: false }): Promise<void> {
     command += "\n";
     return new Promise<void>((resolve) => {
       this.process.stdin.write(command, () => {
         this.transducer.once("agda/lines", (response: string[]) => {
           for (let line of response) {
             const result = agda.sexp.Lexer.tokenize(line);
-            const parser = new agda.sexp.Parser(this.session, fileName, result.tokens);
+            const parser = new agda.sexp.Parser(this.session, fileName, options, result.tokens);
             parser.command();
           }
           resolve();
