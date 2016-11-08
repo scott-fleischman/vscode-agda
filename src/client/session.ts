@@ -8,8 +8,7 @@ import * as client from "vscode-languageclient";
 
 export default class Session implements vs.Disposable {
   public readonly languageClient: client.LanguageClient;
-  public readonly languageClientToken: vs.Disposable;
-  public readonly window: Window = new Window();
+  public readonly window: Window;
   public readonly context: vs.ExtensionContext;
   public readonly subscriptions: vs.Disposable[] = [];
 
@@ -35,14 +34,15 @@ export default class Session implements vs.Disposable {
     };
     this.context = context;
     this.languageClient = new client.LanguageClient("Agda", serverOptions, clientOptions);
-    this.languageClientToken = this.languageClient.start();
     command.registerAll(this);
     request.registerAll(this);
+    this.window = new Window(this);
+    this.subscriptions.push((vs.window as any).onDidChangeVisibleTextEditors(this.window.onDidChangeVisibleTextEditors.bind(this.window)));
+    this.subscriptions.push(this.window);
+    this.subscriptions.push(this.languageClient.start());
   }
 
   public dispose() {
-    this.window.dispose();
-    this.languageClientToken.dispose();
     for (const item of this.subscriptions) item.dispose();
   }
 

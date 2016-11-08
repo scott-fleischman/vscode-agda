@@ -1,22 +1,10 @@
+import Session from "./session";
 import * as vs from "vscode";
 
 type DecorationTypes = { [face: string]: vs.TextEditorDecorationType };
 
 export default class Window implements vs.Disposable {
-  public readonly statusBarItem: vs.StatusBarItem;
-  public readonly decorationTypes: DecorationTypes;
-
-  constructor() {
-    this.statusBarItem = this.initStatusBarItem();
-    this.decorationTypes = this.initDecorationTypes();
-    return this;
-  }
-
-  public dispose() {
-    this.statusBarItem.dispose();
-  }
-
-  public initDecorationTypes(): DecorationTypes {
+  public static createDecorationTypes(): DecorationTypes {
     return {
       bound: vs.window.createTextEditorDecorationType({ color: "purple" }),
       coinductiveconstructor: vs.window.createTextEditorDecorationType({ color: "firebrick" }),
@@ -47,10 +35,23 @@ export default class Window implements vs.Disposable {
     };
   }
 
-  public initStatusBarItem(): vs.StatusBarItem {
+  public static createStatusBarItem(): vs.StatusBarItem {
     const statusBarItem = vs.window.createStatusBarItem(vs.StatusBarAlignment.Right, 0);
     statusBarItem.text = "$(server) [loading]";
     statusBarItem.show();
     return statusBarItem;
+  }
+
+  public readonly decorationTypes: DecorationTypes = Window.createDecorationTypes();
+  public readonly statusBarItem: vs.StatusBarItem = Window.createStatusBarItem();
+  private readonly session: Session;
+
+  constructor(session: Session) {
+    this.session = session;
+    return this;
+  }
+
+  public dispose() {
+    this.statusBarItem.dispose();
   }
 }
