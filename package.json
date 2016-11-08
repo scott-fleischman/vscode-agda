@@ -83,7 +83,7 @@
     "vscode": "^1.0.3"
   },
   "dependencies": {
-    "chevrotain": "^0.17.1",
+    "chevrotain": "^0.18.0",
     "lodash": "^4.16.6",
     "vscode-jsonrpc": "^2.4.0",
     "vscode-languageclient": "^2.5.0",
