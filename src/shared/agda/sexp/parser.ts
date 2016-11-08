@@ -83,7 +83,7 @@ export default class Parser extends chevrotain.Parser {
     const annotations: remote.client.IAnnotation[] = [];
     this.CONSUME(token.SYMBOL_AGDA2_HIGHLIGHT_ADD_ANNOTATIONS);
     this.MANY(() => annotations.push(this.SUBRULE(this.highlightAnnotation)));
-    if (this.options.highlight) this.session.connection.sendNotification(remote.client.highlightAnnotations, { fileName, annotations });
+    if (this.options.highlight) this.session.synchronizer.setAnnotations(fileName, annotations);
     return true;
   });
 
@@ -123,7 +123,7 @@ export default class Parser extends chevrotain.Parser {
         const   endChar = parseInt(  endCharStr, 10) - 1;
         const range = types.Range.create(startLine, startChar, startLine, endChar);
         const diagnostic = types.Diagnostic.create(range, message, types.DiagnosticSeverity.Error, undefined);
-        this.session.connection.sendDiagnostics({ diagnostics: [diagnostic], uri: `file://${path}` });
+        this.session.synchronizer.pushDiagnostics(path, [diagnostic]);
       }
     }
     return success;
