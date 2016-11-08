@@ -41,5 +41,5 @@ export interface IFileAnnotations {
 }
 
 export const highlightAnnotations: rpc.NotificationType<IFileAnnotations> = {
-  method: "agda.client.highlightAnnotations",
+  method: "agda/client/highlightAnnotations",
 };
