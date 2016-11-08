@@ -6,7 +6,7 @@ import * as path from "path";
 import * as vs from "vscode";
 import * as client from "vscode-languageclient";
 
-export default class Client implements vs.Disposable {
+export default class Session implements vs.Disposable {
   public readonly languageClient: client.LanguageClient;
   public readonly languageClientToken: vs.Disposable;
   public readonly window: Window = new Window();
