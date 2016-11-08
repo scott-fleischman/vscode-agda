@@ -1,14 +1,14 @@
 // tslint:disable object-literal-sort-keys
 
 import Session from "../../../server/session";
-import { remote } from "../../../shared";
+import { remote, types } from "../../../shared";
 import * as token from "./token";
 import * as chevrotain from "chevrotain";
 
 export default class Parser extends chevrotain.Parser {
-  public command = this.RULE("command", () => {
+  public command = this.RULE<boolean>("command", () => {
     this.CONSUME(token.DELIM_LPAREN);
-    this.OR([
+    const success = this.OR<boolean>([
       { ALT: () => this.SUBRULE(this.highlightAddAnnotations) },
       { ALT: () => this.SUBRULE(this.highlightClear) },
       { ALT: () => this.SUBRULE(this.goalsAction) },
@@ -16,14 +16,15 @@ export default class Parser extends chevrotain.Parser {
       { ALT: () => this.SUBRULE(this.statusAction) },
     ]);
     this.CONSUME(token.DELIM_RPAREN);
+    return success;
   });
 
   public highlightAnnotation = this.RULE("highlightAnnotation", () => {
     this.CONSUME(token.SYMBOL_QUOTE);
     this.CONSUME1(token.DELIM_LPAREN);
-    const start = this.CONSUME1(token.LITERAL_INTEGER);
-    const end = this.CONSUME2(token.LITERAL_INTEGER);
-    const kind = this.SUBRULE(this.highlightAnnotationKind);
+    const start = chevrotain.getImage(this.CONSUME1(token.LITERAL_INTEGER));
+    const end = chevrotain.getImage(this.CONSUME2(token.LITERAL_INTEGER));
+    const kind = chevrotain.getImage(this.SUBRULE(this.highlightAnnotationKind));
     this.OR([
       { ALT: () => this.CONSUME(token.SYMBOL_NIL) },
     ]);
@@ -37,9 +38,9 @@ export default class Parser extends chevrotain.Parser {
     this.CONSUME2(token.DELIM_RPAREN);
     return {
       fileName: this.fileName,
-      startOff: parseInt(chevrotain.getImage(start), 10) - 1,
-      endOff: parseInt(chevrotain.getImage(end), 10) - 1,
-      face: chevrotain.getImage(kind) as remote.client.HighlightFace,
+      startOff: parseInt(start, 10) - 1,
+      endOff: parseInt(end, 10) - 1,
+      face: kind as remote.client.HighlightFace,
     };
   });
 
@@ -83,10 +84,12 @@ export default class Parser extends chevrotain.Parser {
     this.CONSUME(token.SYMBOL_AGDA2_HIGHLIGHT_ADD_ANNOTATIONS);
     this.MANY(() => annotations.push(this.SUBRULE(this.highlightAnnotation)));
     if (this.options.highlight) this.session.connection.sendNotification(remote.client.highlightAnnotations, { fileName, annotations });
+    return true;
   });
 
   public highlightClear = this.RULE("highlightClear", () => {
     this.CONSUME(token.SYMBOL_AGDA2_HIGHLIGHT_CLEAR);
+    return true;
   });
 
   public goalsAction = this.RULE("goalsAction", () => {
@@ -95,21 +98,41 @@ export default class Parser extends chevrotain.Parser {
     this.CONSUME(token.DELIM_LPAREN);
     // FIXME: payload
     this.CONSUME(token.DELIM_RPAREN);
+    return true;
   });
 
   public infoAction = this.RULE("infoAction", () => {
     this.CONSUME(token.SYMBOL_AGDA2_INFO_ACTION);
-    this.CONSUME1(token.LITERAL_STRING);
-    this.CONSUME2(token.LITERAL_STRING);
-    this.OR([
+    const name: string = JSON.parse(chevrotain.getImage(this.CONSUME1(token.LITERAL_STRING)));
+    const text: string = JSON.parse(chevrotain.getImage(this.CONSUME2(token.LITERAL_STRING)));
+    const append = chevrotain.getImage(this.OR([
       { ALT: () => this.CONSUME(token.SYMBOL_NIL) },
       { ALT: () => this.CONSUME(token.SYMBOL_TRUE) },
-    ]);
+    ])) === "t";
+    void append; // tslint:disable-line no-unused-expression
+    let success = true;
+      // FIXME: implement proper parsing for different error messages
+    if (/\*Errors?\*/.test(name)) { // FIXME: agda is inconsistent about *Error* vs *Errors*
+      success = false;
+      const match = text.match(/^(.*):(\d+),(\d+)-(\d+)\n(?:.*:\d+,\d+:\s*(?=\bParse error\b))?([\s\S]*)/m);
+      if (match) {
+        const [, path, startLineStr, startCharStr, endCharStr, message] = match;
+        // this.session.connection.console.log(JSON.stringify(match));
+        const startLine = parseInt(startLineStr, 10) - 1;
+        const startChar = parseInt(startCharStr, 10) - 1;
+        const   endChar = parseInt(  endCharStr, 10) - 1;
+        const range = types.Range.create(startLine, startChar, startLine, endChar);
+        const diagnostic = types.Diagnostic.create(range, message, types.DiagnosticSeverity.Error, undefined);
+        this.session.connection.sendDiagnostics({ diagnostics: [diagnostic], uri: `file://${path}` });
+      }
+    }
+    return success;
   });
 
   public statusAction = this.RULE("statusAction", () => {
     this.CONSUME(token.SYMBOL_AGDA2_STATUS_ACTION);
     this.CONSUME(token.LITERAL_STRING);
+    return true;
   });
 
   private readonly fileName: string;

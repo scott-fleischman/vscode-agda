@@ -62,17 +62,21 @@ export default class Agda {
     return new Promise((resolve) => this.transducer.once("agda/lines", resolve));
   }
 
-  public async execute(fileName: string, command: string, options: { highlight: boolean } = { highlight: false }): Promise<void> {
+  public async execute(fileName: string, command: string, options: { highlight: boolean } = { highlight: false }): Promise<boolean> {
     command += "\n";
-    return new Promise<void>((resolve) => {
+    return new Promise<boolean>((resolve) => {
       this.process.stdin.write(command, () => {
         this.transducer.once("agda/lines", (response: string[]) => {
+          let status = true;
           for (let line of response) {
-            const result = agda.sexp.Lexer.tokenize(line);
-            const parser = new agda.sexp.Parser(this.session, fileName, options, result.tokens);
-            parser.command();
+            // this.session.connection.console.log(line);
+            const lexing = agda.sexp.Lexer.tokenize(line);
+            const parser = new agda.sexp.Parser(this.session, fileName, options, lexing.tokens);
+            const result = parser.command();
+            // FIXME: we might have undefined here since we do not parse all commands yet
+            if (result != null) status = status && result;
           }
-          resolve();
+          resolve(status);
         });
       });
     });
