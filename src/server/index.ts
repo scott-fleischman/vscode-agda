@@ -10,6 +10,8 @@ session.connection.onExit(lifecycle.exit(session));
 session.connection.onInitialize(lifecycle.initialize(session));
 session.connection.onShutdown(lifecycle.shutdown(session));
 session.connection.onNotification(remote.server.loadFile, request.loadFile(session));
+session.connection.onRequest(remote.server.giveAnnotations, request.giveAnnotations(session));
+
 // session.connection.onCodeAction(async () => {
 //   session.connection.console.log("onCodeAction");
 //   return [];

@@ -1,6 +1,5 @@
 import { remote, types } from "../../shared";
 import Session from "./index";
-import * as assert from "assert";
 
 export class TextDocumentState {
   public annotations: remote.client.IAnnotation[] = [];
@@ -18,6 +17,13 @@ export default class Synchronizer {
 
   public dispose(): void {
     return;
+  }
+
+  public getAnnotations(id: types.TextDocumentIdentifier): remote.client.IAnnotation[] {
+    // this.session.connection.console.log(`textDocuments: ${JSON.stringify(Array.from(this.textDocuments), null, 2)}`)
+    const state = this.textDocuments.get(id.uri);
+    // this.session.connection.console.log(`getAnnotations: ${JSON.stringify(state)}`);
+    return state ? state.annotations : [];
   }
 
   public async initialize(): Promise<void> {
@@ -60,16 +66,17 @@ export default class Synchronizer {
 
   public pushDiagnostics(fileName: string, diagnostics: types.Diagnostic[]): void {
     const textDocument = { uri: `file://${fileName}` };
-    assert (this.textDocuments.has(textDocument.uri));
-    const state = this.textDocuments.get(textDocument.uri) as TextDocumentState;
+    const state = this.textDocuments.get(textDocument.uri) || new TextDocumentState();
     Array.prototype.push.apply(state.diagnostics, diagnostics);
+    this.textDocuments.set(textDocument.uri, state);
     this.session.connection.sendDiagnostics({ diagnostics: state.diagnostics, uri: textDocument.uri });
   }
 
   public setAnnotations(fileName: string, annotations: remote.client.IAnnotation[]): void {
     const textDocument = { uri: `file://${fileName}` };
-    assert (this.textDocuments.has(textDocument.uri));
-    (this.textDocuments.get(textDocument.uri) as TextDocumentState).annotations = annotations;
+    const state = this.textDocuments.get(textDocument.uri) || new TextDocumentState();
+    state.annotations = annotations;
+    this.textDocuments.set(textDocument.uri, state);
     this.session.connection.sendNotification(remote.client.highlightAnnotations, { fileName, annotations });
   }
 }

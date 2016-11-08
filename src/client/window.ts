@@ -1,5 +1,7 @@
+import { remote } from "../shared";
 import Session from "./session";
 import * as vs from "vscode";
+import * as client from "vscode-languageclient";
 
 type DecorationTypes = { [face: string]: vs.TextEditorDecorationType };
 
@@ -51,7 +53,32 @@ export default class Window implements vs.Disposable {
     return this;
   }
 
+  public async applyAnnotations(textEditor: vs.TextEditor, annotations: remote.client.IAnnotation[]): Promise<void> {
+    const collatedHighlights: Map<remote.client.HighlightFace, vs.Range[]> = new Map();
+    for (const { startOff, endOff, face } of annotations) {
+      const start = textEditor.document.positionAt(startOff);
+      const end = textEditor.document.positionAt(endOff);
+      if (!collatedHighlights.has(face)) collatedHighlights.set(face, []);
+      const ranges = collatedHighlights.get(face) as vs.Range[];
+      ranges.push(new vs.Range(start, end));
+    }
+    for (const face of Object.keys(this.decorationTypes) as remote.client.HighlightFace[]) {
+      // NOTE: use [] if lookup fails since we need to clear stale (i.e., no longer used) faces too
+      textEditor.setDecorations(this.decorationTypes[face], collatedHighlights.get(face) || []);
+    }
+  }
+
   public dispose() {
     this.statusBarItem.dispose();
+  }
+
+  public async onDidChangeVisibleTextEditors(textEditors: vs.TextEditor[]) {
+    for (let i = 0; i < textEditors.length; i++) {
+      const textEditor = textEditors[i];
+      if (textEditor.document.languageId !== "agda") continue;
+      if (textEditor.document.isDirty) continue;
+      const annotations = await this.session.languageClient.sendRequest(remote.server.giveAnnotations, client.Code2Protocol.asTextDocumentIdentifier(textEditor.document));
+      this.applyAnnotations(textEditor, annotations);
+    }
   }
 }

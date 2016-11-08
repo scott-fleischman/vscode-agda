@@ -37,7 +37,6 @@ export default class Parser extends chevrotain.Parser {
     });
     this.CONSUME2(token.DELIM_RPAREN);
     return {
-      fileName: this.fileName,
       startOff: parseInt(start, 10) - 1,
       endOff: parseInt(end, 10) - 1,
       face: kind as remote.client.HighlightFace,
