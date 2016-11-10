@@ -3,11 +3,13 @@ import { Agda } from "../processes";
 import * as server from "vscode-languageserver";
 
 import Analyzer from "./analyzer";
+import Annotator from "./annotator";
 import Synchronizer from "./synchronizer";
 
 export default class Session {
   public readonly agda: Agda;
   public readonly analyzer: Analyzer;
+  public readonly annotator: Annotator;
   public readonly connection: server.IConnection = server.createConnection(
     new server.IPCMessageReader(process),
     new server.IPCMessageWriter(process),
@@ -19,6 +21,7 @@ export default class Session {
   constructor() {
     this.agda = new Agda(this);
     this.analyzer = new Analyzer(this);
+    this.annotator = new Annotator(this);
     this.synchronizer = new Synchronizer(this);
     return this;
   }

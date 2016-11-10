@@ -1,4 +1,4 @@
-import { agda } from "../../shared";
+import { agda, types } from "../../shared";
 import Session from "../session";
 import * as childProcess from "child_process";
 import * as events from "events";
@@ -62,7 +62,7 @@ export default class Agda {
     return new Promise((resolve) => this.transducer.once("agda/lines", resolve));
   }
 
-  public async execute(fileName: string, command: string, options: { highlight: boolean } = { highlight: false }): Promise<boolean> {
+  public async execute(textDocument: types.TextDocumentIdentifier, command: string, options: { highlight: boolean } = { highlight: false }): Promise<boolean> {
     command += "\n";
     return new Promise<boolean>((resolve) => {
       this.process.stdin.write(command, () => {
@@ -71,7 +71,7 @@ export default class Agda {
           for (let line of response) {
             // this.session.connection.console.log(line);
             const lexing = agda.sexp.Lexer.tokenize(line);
-            const parser = new agda.sexp.Parser(this.session, fileName, options, lexing.tokens);
+            const parser = new agda.sexp.Parser(this.session, textDocument, options, lexing.tokens);
             const result = parser.command();
             // FIXME: we might have undefined here since we do not parse all commands yet
             if (result != null) status = status && result;

@@ -1,4 +1,5 @@
 import * as rpc from "vscode-jsonrpc";
+import * as client from "vscode-languageclient";
 
 export type HighlightFace
   = "bound"
@@ -36,8 +37,8 @@ export interface IAnnotation {
 }
 
 export interface IFileAnnotations {
-  fileName: string;
   annotations: IAnnotation[];
+  textDocument: client.TextDocumentIdentifier;
 }
 
 export const channelStatusAppendLine: rpc.NotificationType<string> = {

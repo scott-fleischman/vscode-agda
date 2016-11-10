@@ -2,7 +2,7 @@ import * as types from "../types";
 import * as client from "./client";
 import * as rpc from "vscode-jsonrpc";
 
-export const loadFile: rpc.NotificationType<{ fileName: string }> = {
+export const loadFile: rpc.NotificationType<types.TextDocumentIdentifier> = {
   method: "agda/server/loadFile",
 };
 

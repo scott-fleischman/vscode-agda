@@ -4,6 +4,7 @@ import Session from "../../../server/session";
 import { remote, types } from "../../../shared";
 import * as token from "./token";
 import * as chevrotain from "chevrotain";
+import * as url from "url";
 
 export default class Parser extends chevrotain.Parser {
   public command = this.RULE<boolean>("command", () => {
@@ -78,11 +79,10 @@ export default class Parser extends chevrotain.Parser {
   });
 
   public highlightAddAnnotations = this.RULE("highlightAddAnnotations", () => {
-    const fileName = this.fileName;
     const annotations: remote.client.IAnnotation[] = [];
     this.CONSUME(token.SYMBOL_AGDA2_HIGHLIGHT_ADD_ANNOTATIONS);
     this.MANY(() => annotations.push(this.SUBRULE(this.highlightAnnotation)));
-    if (this.options.highlight) this.session.synchronizer.setAnnotations(fileName, annotations);
+    if (this.options.highlight) this.session.annotator.setAnnotations(this.textDocument, annotations);
     return true;
   });
 
@@ -114,15 +114,19 @@ export default class Parser extends chevrotain.Parser {
     if (/\*Errors?\*/.test(name)) { // FIXME: agda is inconsistent about *Error* vs *Errors*
       success = false;
       const match = text.match(/^(.*):(\d+),(\d+)-(\d+)\n(?:.*:\d+,\d+:\s*(?=\bParse error\b))?([\s\S]*)/m);
-      if (match) {
-        const [, path, startLineStr, startCharStr, endCharStr, message] = match;
+      if (match != null) {
         // this.session.connection.console.log(JSON.stringify(match));
-        const startLine = parseInt(startLineStr, 10) - 1;
-        const startChar = parseInt(startCharStr, 10) - 1;
-        const   endChar = parseInt(  endCharStr, 10) - 1;
-        const range = types.Range.create(startLine, startChar, startLine, endChar);
-        const diagnostic = types.Diagnostic.create(range, message, types.DiagnosticSeverity.Error, undefined);
-        this.session.synchronizer.pushDiagnostics(path, [diagnostic]);
+        const [, path, startLineStr, startCharStr, endCharStr, message] = match;
+        const uri = url.parse(`file://${path}`).href;
+        if (uri != null) {
+          const textDocument = { uri };
+          const startLine = parseInt(startLineStr, 10) - 1;
+          const startChar = parseInt(startCharStr, 10) - 1;
+          const   endChar = parseInt(  endCharStr, 10) - 1;
+          const range = types.Range.create(startLine, startChar, startLine, endChar);
+          const diagnostic = types.Diagnostic.create(range, message, types.DiagnosticSeverity.Error, undefined);
+          this.session.analyzer.pushDiagnostics(textDocument, [diagnostic]);
+        }
       }
     }
     const match = name.match(/^\*(.*)\*$/);
@@ -142,15 +146,15 @@ export default class Parser extends chevrotain.Parser {
     return true;
   });
 
-  private readonly fileName: string;
+  private readonly textDocument: types.TextDocumentIdentifier;
   private readonly options: { highlight: boolean };
   private readonly session: Session;
 
-  constructor(session: Session, fileName: string, options: { highlight: boolean }, input: chevrotain.Token[]) {
+  constructor(session: Session, textDocument: types.TextDocumentIdentifier, options: { highlight: boolean }, input: chevrotain.Token[]) {
     super(input, token.all);
-    this.fileName = fileName;
     this.options = options;
     this.session = session;
+    this.textDocument = textDocument;
     chevrotain.Parser.performSelfAnalysis(this);
     return this;
   }
