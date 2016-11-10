@@ -44,12 +44,18 @@ export default class Window implements vs.Disposable {
     return statusBarItem;
   }
 
+  public readonly channel: {
+    status: vs.OutputChannel;
+  } = {
+    status: vs.window.createOutputChannel(`Agda: Status`),
+  };
   public readonly decorationTypes: DecorationTypes = Window.createDecorationTypes();
   public readonly statusBarItem: vs.StatusBarItem = Window.createStatusBarItem();
   private readonly session: Session;
 
   constructor(session: Session) {
     this.session = session;
+    this.channel.status.show(true);
     return this;
   }
 
@@ -68,6 +74,12 @@ export default class Window implements vs.Disposable {
     }
   }
 
+  public async channelStatusAppendLine(data: string): Promise<void> {
+    this.channel.status.clear();
+    this.channel.status.appendLine(data);
+    this.channel.status.show(true);
+  }
+
   public dispose() {
     this.statusBarItem.dispose();
   }
@@ -80,5 +92,10 @@ export default class Window implements vs.Disposable {
       const annotations = await this.session.languageClient.sendRequest(remote.server.giveAnnotations, client.Code2Protocol.asTextDocumentIdentifier(textEditor.document));
       this.applyAnnotations(textEditor, annotations);
     }
+  }
+
+  public async updateStatusBarItem({ text, tooltip }: { text?: string; tooltip?: string }): Promise<void> {
+    if (text != null) this.statusBarItem.text = `$(server) [${text}]`;
+    if (tooltip != null) this.statusBarItem.tooltip = tooltip;
   }
 }

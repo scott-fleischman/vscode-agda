@@ -40,6 +40,14 @@ export interface IFileAnnotations {
   annotations: IAnnotation[];
 }
 
+export const channelStatusAppendLine: rpc.NotificationType<string> = {
+  method: "agda/ChannelStatusAppendLine",
+};
+
 export const highlightAnnotations: rpc.NotificationType<IFileAnnotations> = {
   method: "agda/client/highlightAnnotations",
+};
+
+export const updateStatusBarItem: rpc.NotificationType<{ text?: string; tooltip?: string }> = {
+  method: "agda/updateStatusBarItem",
 };

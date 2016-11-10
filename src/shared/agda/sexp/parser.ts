@@ -125,6 +125,14 @@ export default class Parser extends chevrotain.Parser {
         this.session.synchronizer.pushDiagnostics(path, [diagnostic]);
       }
     }
+    const match = name.match(/^\*(.*)\*$/);
+    if (match != null) {
+      // const statusText = `${match[1].toLowerCase()}`;
+      // this.session.connection.sendNotification(remote.client.updateStatusBarItem, { text: statusText });
+      if (success && text !== "") {
+        this.session.connection.sendNotification(remote.client.channelStatusAppendLine, text); // don't show errors in status channel
+      }
+    }
     return success;
   });
 

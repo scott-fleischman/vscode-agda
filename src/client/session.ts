@@ -7,10 +7,10 @@ import * as vs from "vscode";
 import * as client from "vscode-languageclient";
 
 export default class Session implements vs.Disposable {
-  public readonly languageClient: client.LanguageClient;
-  public readonly window: Window;
   public readonly context: vs.ExtensionContext;
+  public readonly languageClient: client.LanguageClient;
   public readonly subscriptions: vs.Disposable[] = [];
+  public readonly window: Window;
 
   constructor(context: vs.ExtensionContext) {
     const reasonConfig = vs.workspace.getConfiguration("agda");
@@ -48,7 +48,6 @@ export default class Session implements vs.Disposable {
 
   public async onReady(): Promise<void> {
     await this.languageClient.onReady();
-    this.window.statusBarItem.text = "$(server) [agda]";
-    this.window.statusBarItem.tooltip = "agda server online";
+    this.window.updateStatusBarItem({ text: "agda", tooltip: "agda server online" });
   }
 }
