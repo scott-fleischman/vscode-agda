@@ -36,6 +36,7 @@ export default class Analyzer {
   }
 
   public async refresh(textDocument: types.TextDocumentIdentifier): Promise<void> {
+    this.setDiagnostics(textDocument, []);
     await command.loadFile(this.session, textDocument);
   }
 
