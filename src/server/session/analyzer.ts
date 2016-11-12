@@ -14,8 +14,10 @@ export default class Analyzer {
     return this;
   }
 
-  public clear(textDocument: types.TextDocumentIdentifier): void {
+  public clear(textDocument: types.TextDocumentIdentifier): boolean {
+    const status = this.diagnostics.delete(textDocument.uri);
     this.setDiagnostics(textDocument, []);
+    return status;
   }
 
   public dispose(): void {
@@ -41,13 +43,14 @@ export default class Analyzer {
   }
 
   public pushDiagnostics({ uri }: types.TextDocumentIdentifier, rest: types.Diagnostic[]): void {
-    const diagnostics = this.diagnostics.get(uri) || [];
+    if (!this.diagnostics.has(uri)) this.diagnostics.set(uri, []);
+    const diagnostics = this.diagnostics.get(uri) as types.Diagnostic[];
     Array.prototype.push.apply(diagnostics, rest);
-    this.session.connection.sendDiagnostics({ diagnostics, uri });
+    this.session.connection.sendDiagnostics({ uri, diagnostics });
   }
 
   public setDiagnostics({ uri }: types.TextDocumentIdentifier, diagnostics: types.Diagnostic[]): void {
     this.diagnostics.set(uri, diagnostics);
-    this.session.connection.sendDiagnostics({ diagnostics, uri });
+    this.session.connection.sendDiagnostics({ uri, diagnostics });
   }
 }

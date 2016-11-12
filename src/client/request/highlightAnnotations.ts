@@ -5,6 +5,7 @@ import * as client from "vscode-languageclient";
 
 function handler(session: Session): (data: remote.client.IFileAnnotations) => Promise<void> {
   return async ({ annotations, textDocument }) => {
+    // session.languageClient.outputChannel.appendLine(`highlightAnnotations: ${annotations.length}`);
     const window = session.window;
     const uri = client.Protocol2Code.createConverter().asUri(textDocument.uri);
     const document = await vs.workspace.openTextDocument(uri);

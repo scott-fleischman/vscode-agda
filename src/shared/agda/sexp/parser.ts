@@ -7,9 +7,9 @@ import * as chevrotain from "chevrotain";
 import * as url from "url";
 
 export default class Parser extends chevrotain.Parser {
-  public command = this.RULE<boolean>("command", () => {
+  public command = this.RULE("command", () => {
     this.CONSUME(token.DELIM_LPAREN);
-    const success = this.OR<boolean>([
+    this.OR([
       { ALT: () => this.SUBRULE(this.highlightAddAnnotations) },
       { ALT: () => this.SUBRULE(this.highlightClear) },
       { ALT: () => this.SUBRULE(this.goalsAction) },
@@ -17,7 +17,6 @@ export default class Parser extends chevrotain.Parser {
       { ALT: () => this.SUBRULE(this.statusAction) },
     ]);
     this.CONSUME(token.DELIM_RPAREN);
-    return success;
   });
 
   public highlightAnnotation = this.RULE("highlightAnnotation", () => {
@@ -82,13 +81,11 @@ export default class Parser extends chevrotain.Parser {
     const annotations: remote.client.IAnnotation[] = [];
     this.CONSUME(token.SYMBOL_AGDA2_HIGHLIGHT_ADD_ANNOTATIONS);
     this.MANY(() => annotations.push(this.SUBRULE(this.highlightAnnotation)));
-    if (this.options.highlight) this.session.annotator.setAnnotations(this.textDocument, annotations);
-    return true;
+    this.session.annotator.pushAnnotations(this.textDocument, annotations);
   });
 
   public highlightClear = this.RULE("highlightClear", () => {
     this.CONSUME(token.SYMBOL_AGDA2_HIGHLIGHT_CLEAR);
-    return true;
   });
 
   public goalsAction = this.RULE("goalsAction", () => {
@@ -97,7 +94,6 @@ export default class Parser extends chevrotain.Parser {
     this.CONSUME(token.DELIM_LPAREN);
     // FIXME: payload
     this.CONSUME(token.DELIM_RPAREN);
-    return true;
   });
 
   public infoAction = this.RULE("infoAction", () => {
@@ -109,13 +105,10 @@ export default class Parser extends chevrotain.Parser {
       { ALT: () => this.CONSUME(token.SYMBOL_TRUE) },
     ])) === "t";
     void append; // tslint:disable-line no-unused-expression
-    let success = true;
       // FIXME: implement proper parsing for different error messages
     if (/\*Errors?\*/.test(name)) { // FIXME: agda is inconsistent about *Error* vs *Errors*
-      success = false;
       const match = text.match(/^(.*):(\d+),(\d+)-(\d+)\n(?:.*:\d+,\d+:\s*(?=\bParse error\b))?([\s\S]*)/m);
       if (match != null) {
-        // this.session.connection.console.log(JSON.stringify(match));
         const [, path, startLineStr, startCharStr, endCharStr, message] = match;
         const uri = url.parse(`file://${path}`).href;
         if (uri != null) {
@@ -133,29 +126,24 @@ export default class Parser extends chevrotain.Parser {
     if (match != null) {
       // const statusText = `${match[1].toLowerCase()}`;
       // this.session.connection.sendNotification(remote.client.updateStatusBarItem, { text: statusText });
-      if (success && text !== "") {
+      if (text !== "") {
         this.session.connection.sendNotification(remote.client.channelStatusAppendLine, text); // don't show errors in status channel
       }
     }
-    return success;
   });
 
   public statusAction = this.RULE("statusAction", () => {
     this.CONSUME(token.SYMBOL_AGDA2_STATUS_ACTION);
     this.CONSUME(token.LITERAL_STRING);
-    return true;
   });
 
   private readonly textDocument: types.TextDocumentIdentifier;
-  private readonly options: { highlight: boolean };
   private readonly session: Session;
 
-  constructor(session: Session, textDocument: types.TextDocumentIdentifier, options: { highlight: boolean }, input: chevrotain.Token[]) {
+  constructor(session: Session, textDocument: types.TextDocumentIdentifier, input: chevrotain.Token[]) {
     super(input, token.all);
-    this.options = options;
     this.session = session;
     this.textDocument = textDocument;
     chevrotain.Parser.performSelfAnalysis(this);
-    return this;
   }
 }
