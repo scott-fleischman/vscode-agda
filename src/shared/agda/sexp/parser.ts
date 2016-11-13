@@ -22,29 +22,32 @@ export default class Parser extends chevrotain.Parser {
   public highlightAnnotation = this.RULE("highlightAnnotation", () => {
     this.CONSUME(token.SYMBOL_QUOTE);
     this.CONSUME1(token.DELIM_LPAREN);
+    const kinds: remote.client.IAnnotation[] = [];
     const start = chevrotain.getImage(this.CONSUME1(token.LITERAL_INTEGER));
     const end = chevrotain.getImage(this.CONSUME2(token.LITERAL_INTEGER));
-    const kind = chevrotain.getImage(this.SUBRULE(this.highlightAnnotationKind));
+    const startOff = parseInt(start, 10) - 1;
+    const endOff = parseInt(end, 10) - 1;
+    this.CONSUME2(token.DELIM_LPAREN);
+    this.MANY(() => {
+      const face = this.SUBRULE(this.highlightAnnotationKind) as remote.client.HighlightFace;
+      kinds.push({ startOff, endOff, face});
+    });
+    this.CONSUME1(token.DELIM_RPAREN);
     this.OR([
       { ALT: () => this.CONSUME(token.SYMBOL_NIL) },
     ]);
     this.OPTION(() => {
-      this.CONSUME2(token.DELIM_LPAREN);
+      this.CONSUME3(token.DELIM_LPAREN);
       this.CONSUME(token.LITERAL_STRING);
       this.CONSUME(token.DELIM_DOT);
       this.CONSUME3(token.LITERAL_INTEGER);
-      this.CONSUME1(token.DELIM_RPAREN);
+      this.CONSUME2(token.DELIM_RPAREN);
     });
-    this.CONSUME2(token.DELIM_RPAREN);
-    return {
-      startOff: parseInt(start, 10) - 1,
-      endOff: parseInt(end, 10) - 1,
-      face: kind as remote.client.HighlightFace,
-    };
+    this.CONSUME3(token.DELIM_RPAREN);
+    return kinds;
   });
 
   public highlightAnnotationKind = this.RULE("highlightAnnotationKind", () => {
-    this.CONSUME(token.DELIM_LPAREN);
     const kind = this.OR([
       { ALT: () => this.CONSUME(token.FACE_ARGUMENT)},
       { ALT: () => this.CONSUME(token.FACE_BOUND) },
@@ -74,14 +77,13 @@ export default class Parser extends chevrotain.Parser {
       { ALT: () => this.CONSUME(token.FACE_UNSOLVED_CONSTRAINT) },
       { ALT: () => this.CONSUME(token.FACE_UNSOLVED_META) },
     ]);
-    this.CONSUME(token.DELIM_RPAREN);
-    return kind;
+    return chevrotain.getImage(kind);
   });
 
   public highlightAddAnnotations = this.RULE("highlightAddAnnotations", () => {
     const annotations: remote.client.IAnnotation[] = [];
     this.CONSUME(token.SYMBOL_AGDA2_HIGHLIGHT_ADD_ANNOTATIONS);
-    this.MANY(() => annotations.push(this.SUBRULE(this.highlightAnnotation)));
+    this.MANY(() => Array.prototype.push.apply(annotations, this.SUBRULE(this.highlightAnnotation)));
     this.session.annotator.pushAnnotations(this.textDocument, annotations);
   });
 
