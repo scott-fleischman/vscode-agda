@@ -52,6 +52,34 @@
         },
         { "include": "#data-decl" },
         { "include": "#record-decl" },
+        { "include": "#module" },
+        { "include": "#mutual" },
+        { "include": "#instance" }
+      ]
+    },
+    "mutual": {
+      "begin": "^([[:space:]]*+)\\b(mutual)\\b",
+      "end": "^(?!\\1[[:space:]]+|[[:space:]]*(?:$|[{-]-|-[-}]))",
+      "beginCaptures": {
+        "2": { "name": "keyword.control" }
+      },
+      "patterns": [
+        { "include": "#comment" },
+        { "include": "#data-decl" },
+        { "include": "#record-decl" },
+        { "include": "#module" }
+      ]
+    },
+    "instance": {
+      "begin": "^([[:space:]]*+)\\b(instance)\\b",
+      "end": "^(?!\\1[[:space:]]+|[[:space:]]*(?:$|[{-]-|-[-}]))",
+      "beginCaptures": {
+        "2": { "name": "keyword.control" }
+      },
+      "patterns": [
+        { "include": "#comment" },
+        { "include": "#data-decl" },
+        { "include": "#record-decl" },
         { "include": "#module" }
       ]
     },
@@ -168,11 +196,7 @@
     "record-pragma": {
       "patterns": [
         {
-          "match": "no-eta-equality",
-          "name": "keyword.control"
-        },
-        {
-          "match": "(?:co)?inductive",
+          "match": "\\b(?:(?:co)?inductive|constructor|no-eta-equality)\\b",
           "name": "keyword.control"
         }
       ]
