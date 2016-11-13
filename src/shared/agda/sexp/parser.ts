@@ -46,6 +46,7 @@ export default class Parser extends chevrotain.Parser {
   public highlightAnnotationKind = this.RULE("highlightAnnotationKind", () => {
     this.CONSUME(token.DELIM_LPAREN);
     const kind = this.OR([
+      { ALT: () => this.CONSUME(token.FACE_ARGUMENT)},
       { ALT: () => this.CONSUME(token.FACE_BOUND) },
       { ALT: () => this.CONSUME(token.FACE_COINDUCTIVE_CONSTRUCTOR) },
       { ALT: () => this.CONSUME(token.FACE_COMMENT) },

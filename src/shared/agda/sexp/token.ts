@@ -18,6 +18,10 @@ export class DELIM_RPAREN extends SimpleLazyToken {
   public static PATTERN = /[)]/;
 }
 
+export class FACE_ARGUMENT extends SimpleLazyToken {
+  public static PATTERN = /\bargument\b/;
+}
+
 export class FACE_BOUND extends SimpleLazyToken {
   public static PATTERN = /\bbound\b/;
 }
@@ -197,6 +201,7 @@ export const all: TokenConstructor[] = [
   DELIM_DOT,
   SYMBOL_NIL,
   SYMBOL_TRUE,
+  FACE_ARGUMENT,
   FACE_BOUND,
   FACE_COINDUCTIVE_CONSTRUCTOR,
   FACE_COMMENT,

@@ -8,6 +8,7 @@ type DecorationTypes = { [face: string]: vs.TextEditorDecorationType };
 export default class Window implements vs.Disposable {
   public static createDecorationTypes(): DecorationTypes {
     return {
+      argument: vs.window.createTextEditorDecorationType({}),
       bound: vs.window.createTextEditorDecorationType({ color: "purple" }),
       coinductiveconstructor: vs.window.createTextEditorDecorationType({ color: "firebrick" }),
       comment: vs.window.createTextEditorDecorationType({}),
